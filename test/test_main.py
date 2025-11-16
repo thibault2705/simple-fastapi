@@ -1,23 +1,24 @@
 from fastapi.testclient import TestClient
 from src.main import app
+from http import HTTPStatus
 
 client = TestClient(app)
 
 def test_home():
     response = client.get("/")
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert response.json() == "Hi, there"
 
 def test_greet():
     response = client.get("/greeting/Thibault")
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
     assert response.json() == "Hello, Thibault!"
 
 
 def test_gen_random_int():
     max_value = 100
     response = client.get(f"/random/{max_value}")
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
 
     data = response.json()
     assert "max_value" in data
@@ -30,7 +31,7 @@ def test_gen_random_in_range():
     min_value = 1
     max_value = 100
     response = client.get(f"/random-in-range?min_value={min_value}&max_value={max_value}")
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
 
     data = response.json()
     assert "min_value" in data
@@ -43,7 +44,7 @@ def test_gen_random_in_range():
 
 def test_gen_random_in_range_without_min_max():
     response = client.get(f"/random-in-range")
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
 
     data = response.json()
     assert "min_value" in data
@@ -59,7 +60,7 @@ def test_gen_random_in_range_without_min_max():
 def test_gen_random_in_range_with_only_min_value():
     min_value = 5
     response = client.get(f"/random-in-range?min_value={min_value}")
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
 
     data = response.json()
     assert "min_value" in data
@@ -74,7 +75,7 @@ def test_gen_random_in_range_with_only_min_value():
 def test_gen_random_in_range_with_only_max_value():
     max_value = 50
     response = client.get(f"/random-in-range?max_value={max_value}")
-    assert response.status_code == 200
+    assert response.status_code == HTTPStatus.OK
 
     data = response.json()
     assert "min_value" in data
@@ -90,8 +91,48 @@ def test_gen_random_in_range_with_invalid_range():
     min_value = 70
     max_value = 30
     response = client.get(f"/random-in-range?min_value={min_value}&max_value={max_value}")
-    assert response.status_code == 400
+    assert response.status_code == HTTPStatus.BAD_REQUEST
 
     data = response.json()
     assert "detail" in data
     assert data["detail"] == "min_value can't be greater than max_value"
+
+def test_gen_random_in_range_with_invalid_min_type():
+    invalid_param = "abcd"
+    response = client.get(f"/random-in-range?min_value={invalid_param}")
+    assert response.status_code == HTTPStatus.UNPROCESSABLE_CONTENT
+
+    data = response.json()
+    assert data == {
+      "detail": [
+        {
+          "type": "int_parsing",
+          "loc": [
+            "query",
+            "min_value"
+          ],
+          "msg": "Input should be a valid integer, unable to parse string as an integer",
+          "input": "abcd"
+        }
+      ]
+    }
+
+def test_gen_random_in_range_with_invalid_max_type():
+    invalid_param = "xyz"
+    response = client.get(f"/random-in-range?max_value={invalid_param}")
+    assert response.status_code == HTTPStatus.UNPROCESSABLE_CONTENT
+
+    data = response.json()
+    assert data == {
+      "detail": [
+        {
+          "type": "int_parsing",
+          "loc": [
+            "query",
+            "max_value"
+          ],
+          "msg": "Input should be a valid integer, unable to parse string as an integer",
+          "input": "xyz"
+        }
+      ]
+    }
