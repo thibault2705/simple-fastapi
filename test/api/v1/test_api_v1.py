@@ -4,8 +4,8 @@ from http import HTTPStatus
 
 client = TestClient(app)
 
-def test_home():
-    response = client.get("/")
+def test_greet():
+    response = client.get("/api/v1/greeting/Thibault")
     assert response.status_code == HTTPStatus.OK
-    assert response.json() == "Hi, there. This is the homepage."
+    assert response.json() == "Hello, Thibault! This is a greeting from API v1."
 
