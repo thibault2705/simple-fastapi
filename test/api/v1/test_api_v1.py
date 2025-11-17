@@ -11,8 +11,10 @@ from http import HTTPStatus
 
 client = TestClient(app)
 
-def test_greet():
+def test_greet(log_capture_fixture):
     response = client.get("/api/v1/greeting/Thibault")
     assert response.status_code == HTTPStatus.OK
     assert response.json() == "Hello, Thibault! This is a greeting from API v1."
 
+    logs = log_capture_fixture.getvalue()
+    assert "Greeting Thibault" in logs
