@@ -1,3 +1,10 @@
+"""
+ Module Name: router.py
+ Author: thibault2705
+ Date: 2025-11-16
+ Description: Main Test
+ """
+
 from fastapi.testclient import TestClient
 from src.main import app
 from http import HTTPStatus

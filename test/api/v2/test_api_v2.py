@@ -1,3 +1,10 @@
+"""
+ Module Name: test_api_v2.py
+ Author: thibault2705
+ Date: 2025-11-16
+ Description: Test API v2
+ """
+
 from fastapi.testclient import TestClient
 from src.main import app
 from http import HTTPStatus

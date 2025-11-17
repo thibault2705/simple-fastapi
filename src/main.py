@@ -1,4 +1,14 @@
-from fastapi import FastAPI
+"""
+ Module Name: main.py
+ Author: thibault2705
+ Date: 2025-11-15
+ Description: Main file
+ """
+
+from fastapi import FastAPI, Request
+from loguru import logger
+
+logger.debug(f"Initializing main")
 
 import uvicorn
 
@@ -16,7 +26,8 @@ app.include_router(v1_router, prefix="/api")
 app.include_router(v2_router, prefix="/api")
 
 @app.get("/")
-def home():
+def home(request: Request):
+    logger.info(f"Someone requested my homepage from {request.headers.get('user-agent')}")
     return "Hi, there. This is the homepage."
 
 
